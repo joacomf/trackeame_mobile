@@ -175,16 +175,9 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
                             ),
                             FlatButton(
                               onPressed:
-                              // To be implemented : _sendOnMessageToBluetooth()
-                              _connected ? _sendOnMessageToBluetooth : null,
-                              child: Text("ON"),
-                            ),
-                            FlatButton(
-                              onPressed:
-                              // To be implemented : _sendOffMessageToBluetooth()
-                              _connected ? _sendOffMessageToBluetooth : null,
-                              child: Text("OFF"),
-                            ),
+                              _connected ? _sendCredentialsToBluetooth : null,
+                              child: Text("Enviar credenciales"),
+                            )
                           ],
                         ),
                       ],
@@ -275,23 +268,12 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
   }
 
   // Method to send message,
-  // for turning the bletooth device on
-  void _sendOnMessageToBluetooth() {
+  // for turning the bluetooth device on
+  void _sendCredentialsToBluetooth() {
     bluetooth.isConnected.then((isConnected) {
       if (isConnected) {
-        bluetooth.write("1");
+        bluetooth.write("Biblioteca II,universidad;Biblioteca Untref,universidad;\r");
         show('Device Turned On');
-      }
-    });
-  }
-
-  // Method to send message,
-  // for turning the bletooth device off
-  void _sendOffMessageToBluetooth() {
-    bluetooth.isConnected.then((isConnected) {
-      if (isConnected) {
-        bluetooth.write("0");
-        show('Device Turned Off');
       }
     });
   }
