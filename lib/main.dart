@@ -19,14 +19,15 @@ class MyApp extends StatelessWidget {
 }
 
 class BluetoothWidget extends StatefulWidget {
-
   @override
   _BluetoothWidgetState createState() => _BluetoothWidgetState();
 }
 
-class _BluetoothWidgetState extends State<BluetoothWidget>{
-
+class _BluetoothWidgetState extends State<BluetoothWidget> {
+  TextEditingController ssidController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   // Get the instance of the bluetooth
   FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
 
@@ -96,7 +97,8 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
           title: Text("Trackeame Bluetooth"),
           backgroundColor: Colors.redAccent,
         ),
-        body: Container(
+        body:
+        Container(
           // Defining a Column containing FOUR main Widgets wrapped with some padding:
           // 1. Text
           // 2. Row
@@ -126,23 +128,24 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
                     child: Row(
                       children: <Widget>[
                         Text(
-                            'Elegir:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          'Elegir:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Expanded(
-                          child: DropdownButton(
-                            // To be implemented : _getDeviceItems()
-                            items: _getDeviceItems(),
-                            onChanged: (value) => setState(() => _device = value),
-                            value: _device,
-                          )
-                        ),
+                            child: DropdownButton(
+                          // To be implemented : _getDeviceItems()
+                          items: _getDeviceItems(),
+                          onChanged: (value) => setState(() => _device = value),
+                          value: _device,
+                        )),
                         RaisedButton(
                           onPressed:
-                          // To be implemented : _disconnect and _connect
-                          _pressed ? null : _connected ? _disconnect : _connect,
+                              // To be implemented : _disconnect and _connect
+                              _pressed
+                                  ? null
+                                  : _connected ? _disconnect : _connect,
                           child: Text(_connected ? 'Desconectar' : 'Conectar'),
                         ),
                       ],
@@ -151,18 +154,40 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                // Defining a Row containing THREE main Widgets:
+                // 1. Text
+                // 2. DropdownButton
+                // 3. RaisedButton
                 child: Card(
                   elevation: 4,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    // Defining a Row containing THREE main Widgets:
-                    // 1. Text (wrapped with "Expanded")
-                    // 2. FlatButton
-                    // 3. FlatButton
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: <Widget>[
-                          Row(
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextField(
+                                controller: ssidController,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none, hintText: 'SSID'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextField(
+                                controller: passwordController,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none, hintText: 'Password'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
                           children: <Widget>[
                             Expanded(
                               child: Text(
@@ -174,8 +199,9 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
                               ),
                             ),
                             FlatButton(
-                              onPressed:
-                              _connected ? _sendCredentialsToBluetooth : null,
+                              onPressed: _connected
+                                  ? _sendCredentialsToBluetooth
+                                  : null,
                               child: Text("Enviar credenciales"),
                             )
                           ],
@@ -191,8 +217,8 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
                   child: Center(
                     child: Text(
                       "NOTE: If you cannot find the device in the list, "
-                          "please turn on bluetooth and pair the device by "
-                          "going to the bluetooth settings",
+                      "please turn on bluetooth and pair the device by "
+                      "going to the bluetooth settings",
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -253,9 +279,9 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
   // Method to show a Snackbar,
   // taking message as the text
   Future show(
-      String message, {
-        Duration duration: const Duration(seconds: 3),
-      }) async {
+    String message, {
+    Duration duration: const Duration(seconds: 3),
+  }) async {
     await new Future.delayed(new Duration(milliseconds: 100));
     _scaffoldKey.currentState.showSnackBar(
       new SnackBar(
@@ -272,8 +298,12 @@ class _BluetoothWidgetState extends State<BluetoothWidget>{
   void _sendCredentialsToBluetooth() {
     bluetooth.isConnected.then((isConnected) {
       if (isConnected) {
-        bluetooth.write("Biblioteca II,universidad;Biblioteca Untref,universidad;\r");
-        show('Device Turned On');
+        bluetooth.write(ssidController.text + ',' + passwordController.text + ';\r');
+        //bluetooth.write(
+         //   "Biblioteca II,universidad;Biblioteca Untref,universidad;\r");
+        //show('Device Turned On');
+        //show(testController.text);
+        show('Credenciales enviadas');
       }
     });
   }
