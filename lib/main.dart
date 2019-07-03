@@ -26,6 +26,7 @@ class BluetoothWidget extends StatefulWidget {
 class _BluetoothWidgetState extends State<BluetoothWidget> {
   TextEditingController ssidController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
+  String credentialsToSend = "";
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   // Get the instance of the bluetooth
@@ -97,8 +98,7 @@ class _BluetoothWidgetState extends State<BluetoothWidget> {
           title: Text("Trackeame Bluetooth"),
           backgroundColor: Colors.redAccent,
         ),
-        body:
-        Container(
+        body: Container(
           // Defining a Column containing FOUR main Widgets wrapped with some padding:
           // 1. Text
           // 2. Row
@@ -182,21 +182,17 @@ class _BluetoothWidgetState extends State<BluetoothWidget> {
                               child: TextField(
                                 controller: passwordController,
                                 decoration: InputDecoration(
-                                    border: InputBorder.none, hintText: 'Password'),
+                                    border: InputBorder.none,
+                                    hintText: 'Password'),
                               ),
                             ),
                           ],
                         ),
                         Row(
                           children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                "Dispositivo Vinculado",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.green,
-                                ),
-                              ),
+                            FlatButton(
+                              onPressed: _connected ? _addCredentials : null,
+                              child: Text("Agregar red"),
                             ),
                             FlatButton(
                               onPressed: _connected
@@ -216,13 +212,12 @@ class _BluetoothWidgetState extends State<BluetoothWidget> {
                   padding: const EdgeInsets.all(20),
                   child: Center(
                     child: Text(
-                      "NOTE: If you cannot find the device in the list, "
-                      "please turn on bluetooth and pair the device by "
-                      "going to the bluetooth settings",
+                      "Agregue las redes que desee enviar a trackeame y luego"
+                      " presione 'Enviar credenciales'",
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Colors.red),
+                          color: Colors.blue),
                     ),
                   ),
                 ),
@@ -276,6 +271,20 @@ class _BluetoothWidgetState extends State<BluetoothWidget> {
     setState(() => _pressed = true);
   }
 
+  void _addCredentials() {
+    if (ssidController.text != "") {
+      credentialsToSend +=
+          ssidController.text + ',' + passwordController.text + ';';
+      show('Credenciales de ' +
+          ssidController.text +
+          ' agregadas satifactoriamente');
+    } else {
+      show('El campo SSID no puede estar en blanco');
+    }
+    ssidController.clear();
+    passwordController.clear();
+  }
+
   // Method to show a Snackbar,
   // taking message as the text
   Future show(
@@ -298,12 +307,9 @@ class _BluetoothWidgetState extends State<BluetoothWidget> {
   void _sendCredentialsToBluetooth() {
     bluetooth.isConnected.then((isConnected) {
       if (isConnected) {
-        bluetooth.write(ssidController.text + ',' + passwordController.text + ';\r');
-        //bluetooth.write(
-         //   "Biblioteca II,universidad;Biblioteca Untref,universidad;\r");
-        //show('Device Turned On');
-        //show(testController.text);
-        show('Credenciales enviadas');
+        bluetooth.write(credentialsToSend + '\r');
+        credentialsToSend = "";
+        show("Credenciales enviadas satisfactoriamente");
       }
     });
   }
